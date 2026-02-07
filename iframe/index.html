@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>竖向布局交互界面</title>
+    <style>
+        /* 1. CSS变量定义 - 支持主题切换 */
+        :root {
+            /* 亮色主题变量 */
+            --primary-bg: #ffffff;
+            --secondary-bg: #f5f5f5;
+            --text-color: #333333;
+            --input-bg: #ffffff;
+            --input-border: #cccccc;
+            --button-bg: #4CAF50;
+            --button-hover: #45a049;
+            --option-bg: #f9f9f9;
+            --option-selected: #e8f5e9;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --theme-toggle-bg: #f0f0f0;
+        }
+        
+        /* 暗色主题变量 */
+        .dark-theme {
+            --primary-bg: #1a1a1a;
+            --secondary-bg: #2d2d2d;
+            --text-color: #e0e0e0;
+            --input-bg: #2d2d2d;
+            --input-border: #555555;
+            --button-bg: #388E3C;
+            --button-hover: #2E7D32;
+            --option-bg: #3d3d3d;
+            --option-selected: #2d4d2d;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --theme-toggle-bg: #333333;
+        }
+        
+        /* 2. 基础样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        html, body {
+            height: 100%;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        /* 3. 竖向布局容器 - 使用Flexbox */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            padding: 20px;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 600px;
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        /* 4. 主题切换按钮样式 */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--theme-toggle-bg);
+            border: 2px solid var(--input-border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            z-index: 100;
+            box-shadow: 0 2px 8px var(--shadow-color);
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.05);
+        }
+        
+        /* 5. 标题区域 */
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+        
+        .header p {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        /* 6. 大型输入框样式 */
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .input-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .large-input {
+            width: 100%;
+            height: 120px;
+            padding: 20px;
+            font-size: 1.2rem;
+            border: 2px solid var(--input-border);
+            border-radius: 12px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            resize: vertical;
+            outline: none;
+        }
+        
+        .large-input:focus {
+            border-color: var(--button-bg);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+        
+        /* 7. 选择块样式 - 三选一 */
+        .selection-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .selection-section2 {
+            display: flex;
+            gap: 15px;
+			flex-direction: row;
+			justify-content: space-between;
+        }
+
+        .selection-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .options-container2 {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+		
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            background-color: var(--option-bg);
+            border: 2px solid var(--input-border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .option-item2 {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            background-color: var(--option-bg);
+            border: 2px solid var(--input-border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+		.option-item:hover {
+            background-color: var(--option-selected);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--shadow-color);
+        }
+        .option-item2:hover {
+            background-color: var(--option-selected);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--shadow-color);
+        }
+
+		.option-item.selected {
+            background-color: var(--option-selected);
+            border-color: var(--button-bg);
+        }
+		.option-item2.selected {
+            background-color: var(--option-selected);
+            border-color: var(--button-bg);
+        }
+        
+        .option-radio {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            accent-color: var(--button-bg);
+        }
+		.option-radio2 {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            accent-color: var(--button-bg);
+        }
+
+        
+        .option-text {
+            font-size: 1.1rem;
+            flex-grow: 1;
+        }
+        
+        /* 8. 确认按钮样式 和输入间隔 */
+        .button-section {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+			gap: 15px;
+        }
+        
+        .confirm-button {
+			width: 30%;
+            padding: 10px 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+        
+        .confirm-button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px var(--shadow-color);
+        }
+        
+        .confirm-button:active {
+            transform: translateY(-1px);
+        }
+
+        .confirm-input[type="number"] {
+			width: 70%;
+            gap: 10px;
+            padding: 10px 15px;
+            border: 2px solid var(--input-border);
+            border-radius: 12px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            resize: vertical;
+            outline: none;
+        }
+
+		.confirm-input:focus {
+            border-color: var(--button-bg);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+        
+        /* 9. 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                max-width: 90%;
+                gap: 25px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .large-input {
+                height: 100px;
+                font-size: 1.1rem;
+            }
+            
+            .option-item {
+                padding: 15px 18px;
+            }
+			.option-item2 {
+                padding: 15px 18px;
+            }
+
+            
+            .confirm-button {
+                padding: 10px 10px 10px 10px;
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .theme-toggle {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .large-input {
+                height: 90px;
+                padding: 15px;
+            }
+            
+            .options-container {
+                gap: 10px;
+            }
+			.options-container2 {
+                gap: 10px;
+            }
+
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- 主题切换按钮 -->
+    <div class="theme-toggle" id="themeToggle">
+        🌙
+    </div>
+    
+    <!-- 主容器 - 竖向布局 -->
+    <div class="container">
+        <!-- 标题区域 -->
+        <!-- <div class="header">
+            <p>批量放置网络标签、输入、输出、双向符号。</p>
+        </div> -->
+        
+        <!-- 大型输入框区域 -->
+        <div class="input-section">
+            <!-- <label class="input-label" for="largeInput">请输入内容：</label> -->
+            <textarea 
+                class="large-input" 
+                id="largeInput" 
+                placeholder="在此处输入您的网络内容（回车分割）"
+            ></textarea>
+        </div>
+		<!-- 横向的选择 -->
+        <div class="selection-section2">
+            <div class="options-container2" id="optionsContainer2">
+				<div class="option-item2" data-value="option11">
+                    <input type="radio" name="selection2" id="option11" class="option-radio2">
+					<svg width="40" height="20.127" viewBox="0 0 40 20.127">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2.44732;stroke-dasharray:none"
+       d="M 10.54816,1.2236557 H 29.451785 V 15.401371 h -9.45181 v 4.725905 -4.725905 H 10.54816 Z"
+       id="path1-1-8" />
+    <text
+       xml:space="preserve"
+       style="font-weight:300;font-size:12.5672px;line-height:21.0943px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN Light';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:#000000;stroke-width:0.233334;stroke-dasharray:none"
+       x="15.208528"
+       y="12.847875"
+       id="text2"><tspan
+         sodipodi:role="line"
+         id="tspan2"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5672px;line-height:21.0943px;font-family:sans-serif;-inkscape-font-specification:sans-serif;stroke-width:0.233334;stroke-dasharray:none"
+         x="15.208528"
+         y="12.847875">N</tspan></text>
+	</svg>
+				</div>
+			</div>
+            <div class="options-container2" id="optionsContainer2">
+				<div class="option-item2" data-value="option22">
+                    <input type="radio" name="selection2" id="option22" class="option-radio2">
+					<svg width="40" height="11.281" viewBox="0 0 40 11.281">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.43127;stroke-dasharray:none"
+       d="m 0,5.5156097 h 9.599947 l 9.599949,-4.79997376 h 9.599947 L 38.399789,5.5156097 28.799843,10.315584 H 19.199896 L 9.599947,5.5156097"
+       id="path1-1-6-5" />
+						</svg>
+
+				</div>
+			</div>
+		</div>
+		<div class="selection-section2">
+            <div class="options-container2" id="optionsContainer2">
+				<div class="option-item2" data-value="option33">
+                    <input type="radio" name="selection2" id="option33" class="option-radio2">
+					<svg width="40" height="11.281" viewBox="0 0 40 11.281">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.43127;stroke-dasharray:none"
+       d="M 0,5.515608 H 9.5999469 V 0.715635 H 28.799841 l 9.599948,4.799973 -9.599948,4.799974 H 9.5999469 V 5.515608"
+       id="path1-1-6" />
+					</svg>
+				</div>
+			</div>
+            <div class="options-container2" id="optionsContainer2">
+				<div class="option-item2" data-value="option44">
+                    <input type="radio" name="selection2" id="option44" class="option-radio2">
+					<svg width="40" height="11.281" viewBox="0 0 40 11.281">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.46363;stroke-dasharray:none"
+       d="M 0.73181604,0.73181498 H 20.365907 L 30.182954,5.640337 H 40 30.182954 L 20.365907,10.54886 H 0.73181604 Z"
+       id="path1-1" />
+					</svg>
+				</div>
+			</div>
+		</div>
+        <!-- 选择块区域 - 三选一 -->
+        <div class="selection-section">
+            <div class="options-container" id="optionsContainer">
+                <!-- 选项1 -->
+                <div class="option-item" data-value="option1">
+                    <input type="radio" name="selection" id="option1" class="option-radio">
+					<svg width="90" height="50" viewBox="0 0 90 50">
+						<path
+						style="fill:none;stroke:#000000;stroke-width:1.6293"
+						d="M 36.268833,0.81465 H 60.862244 L 73.158945,6.9630013 H 85.45565 73.158945 L 60.862244,13.111353 H 36.268833 Z"
+						id="path1" />
+						<path
+						style="fill:none;stroke:#000000;stroke-width:1.62925"
+						d="m 36.268809,18.85183 h 24.592694 l 12.296341,6.148173 H 85.45419 73.157844 L 60.861503,31.148174 H 36.268809 Z"
+						id="path1-8" />
+						<path
+						style="fill:none;stroke:#000000;stroke-width:1.62925"
+						d="m 36.268809,36.888626 h 24.592693 l 12.296341,6.148172 H 85.454189 73.157843 L 60.861502,49.184969 H 36.268809 Z"
+						id="path1-1" />
+						<text
+						xml:space="preserve"
+						style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.2889px;line-height:18.9486px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:none;stroke:#000000;stroke-width:0.264999"
+						x="3.8335595"
+						y="11.083458"
+						id="text2"><tspan
+							sodipodi:role="line"
+							id="tspan2"
+							style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:11.2889px;line-height:18.9486px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN Light';fill:#000000;fill-opacity:1;stroke-width:0.265"
+							x="3.8335595"
+							y="11.083458">NET1</tspan></text>
+						<text
+						xml:space="preserve"
+						style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.2889px;line-height:18.9486px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:none;stroke:#000000;stroke-width:0.264999"
+						x="3.901288"
+						y="29.120459"
+						id="text2-8"><tspan
+							sodipodi:role="line"
+							id="tspan2-2"
+							style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:11.2889px;line-height:18.9486px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN Light';fill:#000000;fill-opacity:1;stroke-width:0.265"
+							x="3.901288"
+							y="29.120459">NET2</tspan></text>
+						<text
+						xml:space="preserve"
+						style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.2889px;line-height:18.9486px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:none;stroke:#000000;stroke-width:0.264999"
+						x="4.0028968"
+						y="47.157253"
+						id="text2-7"><tspan
+							sodipodi:role="line"
+							id="tspan2-1"
+							style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:11.2889px;line-height:18.9486px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN Light';fill:#000000;fill-opacity:1;stroke-width:0.265"
+							x="4.0028968"
+							y="47.157253">NET3</tspan></text>
+					</svg>
+                </div>
+                
+                <!-- 选项2 -->
+                <div class="option-item" data-value="option2">
+                    <input type="radio" name="selection" id="option2" class="option-radio">
+					<svg width="50" height="81" viewBox="0 0 50 81">
+						<path
+						style="fill:none;stroke:#000000;stroke-width:1.6293"
+						d="M 49.184944,31.574358 V 56.167769 L 43.036592,68.46447 V 80.761175 68.46447 L 36.888241,56.167769 V 31.574358 Z"
+						id="path1" />
+						<path
+						style="fill:none;stroke:#000000;stroke-width:1.62925"
+						d="M 31.147764,31.574334 V 56.167028 L 24.999591,68.463369 V 80.759715 68.463369 L 18.85142,56.167028 V 31.574334 Z"
+						id="path1-8" />
+						<path
+						style="fill:none;stroke:#000000;stroke-width:1.62925"
+						d="M 13.110968,31.574334 V 56.167027 L 6.962796,68.463368 V 80.759714 68.463368 L 0.81462502,56.167027 V 31.574334 Z"
+						id="path1-1" />
+						<text
+						xml:space="preserve"
+						style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.2889px;line-height:18.9486px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:none;stroke:#000000;stroke-width:0.264999"
+						x="-0.86091584"
+						y="-38.916134"
+						id="text2"
+						transform="rotate(90)"><tspan
+							sodipodi:role="line"
+							id="tspan2"
+							style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:11.2889px;line-height:18.9486px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN Light';fill:#000000;fill-opacity:1;stroke-width:0.265"
+							x="-0.86091584"
+							y="-38.916134">NET1</tspan></text>
+						<text
+						xml:space="preserve"
+						style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.2889px;line-height:18.9486px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:none;stroke:#000000;stroke-width:0.264999"
+						x="-0.79318589"
+						y="-20.879137"
+						id="text2-8"
+						transform="rotate(90)"><tspan
+							sodipodi:role="line"
+							id="tspan2-2"
+							style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:11.2889px;line-height:18.9486px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN Light';fill:#000000;fill-opacity:1;stroke-width:0.265"
+							x="-0.79318589"
+							y="-20.879137">NET2</tspan></text>
+						<text
+						xml:space="preserve"
+						style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.2889px;line-height:18.9486px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:none;stroke:#000000;stroke-width:0.264999"
+						x="-0.69157761"
+						y="-2.8423405"
+						id="text2-7"
+						transform="rotate(90)"><tspan
+							sodipodi:role="line"
+							id="tspan2-1"
+							style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:11.2889px;line-height:18.9486px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN Light';fill:#000000;fill-opacity:1;stroke-width:0.265"
+							x="-0.69157761"
+							y="-2.8423405">NET3</tspan></text>
+				</svg>
+                </div>
+                
+                <!-- 选项3 -->
+                <div class="option-item" data-value="option3">
+                    <input type="radio" name="selection" id="option3" class="option-radio">
+					<svg width="50" height="81" viewBox="0 0 50 81">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.6293"
+       d="M 49.184944,31.574358 V 56.167769 L 43.036592,68.46447 V 80.761175 68.46447 L 36.888241,56.167769 V 31.574358 Z"
+       id="path1" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.62925"
+       d="M 31.147764,31.574334 V 56.167028 L 24.999591,68.463369 V 80.759715 68.463369 L 18.85142,56.167028 V 31.574334 Z"
+       id="path1-8" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.62925"
+       d="M 13.110968,31.574334 V 56.167027 L 6.962796,68.463368 V 80.759714 68.463368 L 0.81462502,56.167027 V 31.574334 Z"
+       id="path1-1" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.2889px;line-height:18.9486px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:none;stroke:#000000;stroke-width:0.264999"
+       x="-0.86091584"
+       y="-2.8423398"
+       id="text2"
+       transform="rotate(90)"><tspan
+         sodipodi:role="line"
+         id="tspan2"
+         style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:11.2889px;line-height:18.9486px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN Light';fill:#000000;fill-opacity:1;stroke-width:0.265"
+         x="-0.86091584"
+         y="-2.8423398">NET1</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.2889px;line-height:18.9486px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:none;stroke:#000000;stroke-width:0.264999"
+       x="-0.79318732"
+       y="-20.879137"
+       id="text2-8"
+       transform="rotate(90)"><tspan
+         sodipodi:role="line"
+         id="tspan2-2"
+         style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:11.2889px;line-height:18.9486px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN Light';fill:#000000;fill-opacity:1;stroke-width:0.265"
+         x="-0.79318732"
+         y="-20.879137">NET2</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.2889px;line-height:18.9486px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:none;stroke:#000000;stroke-width:0.264999"
+       x="-0.69157809"
+       y="-38.916134"
+       id="text2-7"
+       transform="rotate(90)"><tspan
+         sodipodi:role="line"
+         id="tspan2-1"
+         style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:11.2889px;line-height:18.9486px;font-family:'Maple Mono NF CN';-inkscape-font-specification:'Maple Mono NF CN Light';fill:#000000;fill-opacity:1;stroke-width:0.265"
+         x="-0.69157809"
+         y="-38.916134">NET3</tspan></text>
+					</svg>
+                </div>
+
+            </div>
+        </div>
+        
+        <!-- 确认按钮区域 -->
+        <div class="button-section">
+            <input class="confirm-input" type="number" id="valueInput" placeholder="元件间隔（0.1inch）" min="0.01" step="0.01">
+            <button class="confirm-button" id="confirmButton">
+                确认
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 1. 主题切换功能
+        const themeToggle = document.getElementById('themeToggle');
+        const bodyElement = document.body;
+        
+        // 检查本地存储的主题偏好
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        if (savedTheme === 'dark') {
+            bodyElement.classList.add('dark-theme');
+            themeToggle.textContent = '☀️';
+        }
+        
+        // 主题切换事件
+        themeToggle.addEventListener('click', function() {
+            bodyElement.classList.toggle('dark-theme');
+            
+            if (bodyElement.classList.contains('dark-theme')) {
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+        
+        // 2. 选择块2交互功能
+        const optionItems2 = document.querySelectorAll('.option-item2');
+        const radioInputs2 = document.querySelectorAll('.option-radio2');
+        
+        optionItems2.forEach(item2 => {
+            item2.addEventListener('click', function() {
+                // 移除所有选项的选中状态
+                optionItems2.forEach(opt2 => {
+                    opt2.classList.remove('selected');
+                });
+                
+                // 添加当前选项的选中状态
+                this.classList.add('selected');
+                
+                // 选中对应的单选按钮
+                const radioId2 = this.getAttribute('data-value');
+                const radioInput2 = document.getElementById(radioId2);
+                if (radioInput2) {
+                    radioInput2.checked = true;
+                }
+            });
+        });
+
+
+        // 3. 选择块交互功能
+        const optionItems = document.querySelectorAll('.option-item');
+        const radioInputs = document.querySelectorAll('.option-radio');
+        
+        optionItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // 移除所有选项的选中状态
+                optionItems.forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // 添加当前选项的选中状态
+                this.classList.add('selected');
+                
+                // 选中对应的单选按钮
+                const radioId = this.getAttribute('data-value');
+                const radioInput = document.getElementById(radioId);
+                if (radioInput) {
+                    radioInput.checked = true;
+                }
+            });
+        });
+        
+        // 4. 确认按钮交互
+        const confirmButton = document.getElementById('confirmButton');
+        const largeInput = document.getElementById('largeInput');
+        
+        confirmButton.addEventListener('click', function() {
+            // 获取输入框内容
+            const inputValue = largeInput.value.trim();
+            
+            // 获取选中的选项
+            const selectedOption = document.querySelector('input[name="selection"]:checked');
+            const selectedOption2 = document.querySelector('input[name="selection2"]:checked');
+            console.log(selectedOption);
+            console.log(selectedOption.id);
+            // 模拟提交反馈
+            if (!inputValue) {
+                alert('请输入内容后再确认！');
+                largeInput.focus();
+                return;
+            } else {
+				let lines = inputValue.split('\n');
+
+				// 输出结果
+				console.log(lines);
+				// 预期输出：["第一行", "第二行", "第三行"]
+				let i = 0;
+				let currentValue = parseFloat(document.getElementById('valueInput').value) || 0.1;
+				let x = lines.length+1;
+				console.log(x);
+				for (let a of lines) {
+					i++;
+					console.log(a);
+					
+					if (selectedOption.id=='option1') {
+						if (selectedOption2.id=='option11') {
+							eda.sys_ToastMessage.showMessage('eda目前没有这种api', 2);
+							return
+						} else if (selectedOption2.id=='option22') {
+							eda.sch_PrimitiveComponent.createNetPort('BI', a, 0, 0-i*100*currentValue);
+						} else if (selectedOption2.id=='option33') {
+							eda.sch_PrimitiveComponent.createNetPort('OUT', a, 0, 0-i*100*currentValue);
+						} else if (selectedOption2.id=='option44') {
+							eda.sch_PrimitiveComponent.createNetPort('IN', a, 0, 0-i*100*currentValue);
+						}
+					} else if (selectedOption.id=='option2') {
+						if (selectedOption2.id=='option11') {
+							eda.sys_ToastMessage.showMessage('eda目前没有这种api', 2);
+							return
+						} else if (selectedOption2.id=='option22') {
+							eda.sch_PrimitiveComponent.createNetPort('BI', a, 0-i*100*currentValue,0, 270);
+						} else if (selectedOption2.id=='option33') {
+							eda.sch_PrimitiveComponent.createNetPort('OUT', a, 0-i*100*currentValue,0,270);
+						} else if (selectedOption2.id=='option44') {
+							eda.sch_PrimitiveComponent.createNetPort('IN', a, 0-i*100*currentValue,0,90);
+						}
+					} else if (selectedOption.id=='option3') {
+						if (selectedOption2.id=='option11') {
+							eda.sys_ToastMessage.showMessage('eda目前没有这种api', 2);
+							return
+						} else if (selectedOption2.id=='option22') {
+							eda.sch_PrimitiveComponent.createNetPort('BI', a, (i-x)*100*currentValue,0, 270);
+						} else if (selectedOption2.id=='option33') {
+							eda.sch_PrimitiveComponent.createNetPort('OUT', a, (i-x)*100*currentValue,0,270);
+						} else if (selectedOption2.id=='option44') {
+							eda.sch_PrimitiveComponent.createNetPort('IN', a, (i-x)*100*currentValue,0,90);
+						}
+					}
+					
+				}
+			}
+        });
+                
+        // 5. 页面加载完成后的初始化
+        window.addEventListener('DOMContentLoaded', function() {
+            // 默认选中第一个选项
+            optionItems[0].click();
+            optionItems2[3].click();
+
+        });
+    </script>
+</body>
+</html>

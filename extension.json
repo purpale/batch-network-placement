@@ -1,0 +1,45 @@
+{
+	"name": "batch-network-placement",
+	"uuid": "6c70c47e8fbf4652bdb002135f0cec6a",
+	"displayName": "批量放置网络标签",
+	"description": "批量放置网络标签、输入、输出、双向符号。",
+	"version": "1.0.0",
+	"publisher": "啾飒",
+	"engines": {
+		"eda": "^3.0.0"
+	},
+	"license": "Apache-2.0",
+	"repository": {
+		"type": "github",
+		"url": "https://github.com/purpale/batch-network-placement"
+	},
+	"categories": "Other",
+	"keywords": [
+		"符号",
+		"批量",
+		"网络标签"
+	],
+	"images": {
+		"logo": "./images/logo.png"
+	},
+	"homepage": "https://github.com/purpale",
+	"bugs": "https://github.com/purpale/batch-network-placement/issues",
+	"activationEvents": {},
+	"entry": "./dist/index",
+	"dependentExtensions": {},
+	"headerMenus": {
+		"sch": [
+			{
+				"id": "Batch Network Placement",
+				"title": "批量放置网络标签",
+				"menuItems": [
+					{
+						"id": "Kaishi",
+						"title": "开始",
+						"registerFn": "kaishi"
+					}
+				]
+			}
+		]
+	}
+}
